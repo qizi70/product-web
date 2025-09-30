@@ -7,8 +7,9 @@
     "node": "^20.19.0 || >=22.12.0"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "run-p type-check \"build-only {@}\" --"
+    "dev": "vite --mode dev",
+    "build:dev": "vite build --mode development",
+    "build": "vite build --mode production"
   },
   "dependencies": {
     "pinia": "^3.0.3",
