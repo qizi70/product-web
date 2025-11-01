@@ -1,11 +1,31 @@
 {
-  "files": [],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    },
-    {
-      "path": "./tsconfig.app.json"
+  "compilerOptions": {
+    "outDir": "./built/",
+    "sourceMap": true,
+    "strict": true,
+    "noImplicitReturns": true, // 并不是所有函数里的代码都有返回值时，抛出错误
+    "noImplicitAny": false, // 在表达式和声明上有隐含的 any 类型时报错
+    "noImplicitThis": false, // 当 this 表达式值为 any 类型的时候，生成一个错误
+    "module": "ES2020",
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "target": "ES2015",
+    "jsx": "preserve",
+    "types": ["vite/client"],
+    "baseUrl": ".",
+    "allowJs": true,
+    "isolatedModules": true,
+    "lib": ["es2015", "dom", "ES2015.Promise"],
+    "suppressImplicitAnyIndexErrors": true, // 解决 forin 循环 使用obj[key] 的报错
+    "ignoreDeprecations": "5.0",
+    "paths": {
+      "@": ["src"],
+      "@/*": ["src/*"]
     }
-  ]
+  },
+  "vueCompilerOptions": {
+    "experimentalDisableTemplateSupport": true // 去掉volar下el标签红色波浪线问题
+  },
+  "exclude": ["node_modules"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/**/*.js"]
 }
