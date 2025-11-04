@@ -99,6 +99,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { handleConfirm } from '@/common/CompostionFunc'
 import { getRepairRecords, deleteRepairRecord } from '@/api/index'
 import { showToast } from 'vant'
 import Utils from '@/common/utils'
@@ -141,8 +142,8 @@ const cost = computed(() => {
     hjSale: 0, // 当日恒捷利润
   }
   models.value.forEach((item) => {
-    obj.curCost += +item.inputTotalCostPrice || +item.totalCostPrice || 0
-    obj.curSale += +item.inputTotalSalePrice || +item.totalSalePrice || 0
+    obj.curCost += +item.inputTotalCostPrice || +item.autoTotalCostPrice || 0
+    obj.curSale += +item.inputTotalSalePrice || +item.autoTotalSalePrice || 0
   })
   // 当日总成本
   const curTotalCost = obj.curRent + obj.curSalary + obj.curCost
@@ -188,6 +189,9 @@ const editModel = (modelId) => {
 
 // 删除车型
 const deleteModel = async (modelId) => {
+  const confirm = handleConfirm('确定删除该车型吗？')
+  if (!confirm) return
+
   deleteRepairRecord(modelId).then(
     (res) => {
       if (res.code == 200) {
@@ -210,8 +214,9 @@ const addNewModel = () => {
 
 // 计算单个车型的利润
 const calculateProfit = (model) => {
-  const totalCostPrice = model.inputTotalCostPrice || model.totalCostPrice || 0
-  const totalSalePrice = model.inputTotalSalePrice || model.totalSalePrice || 0
+  console.log('model: ', model)
+  const totalCostPrice = model.inputTotalCostPrice || model.autoTotalCostPrice || 0
+  const totalSalePrice = model.inputTotalSalePrice || model.autoTotalSalePrice || 0
   return `总收入：¥${totalSalePrice} 总成本：¥${totalCostPrice}`
 }
 </script>

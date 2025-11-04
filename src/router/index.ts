@@ -30,6 +30,6 @@ const routes = [
 ];
 
 export default createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.VITE_NODE_CODE === 'development' ? '' : '/product-web/'),
   routes
 });

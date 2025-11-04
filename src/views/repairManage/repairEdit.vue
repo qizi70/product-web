@@ -46,6 +46,7 @@
       <van-field
         label="产品名称"
         v-model="product.name"
+        @change="handleProductNameChange($event, index)"
         placeholder="请输入产品名称"
         :rules="[{ required: true, message: '请输入产品名称' }]"
         input-align="right"
@@ -59,22 +60,18 @@
         v-model.number="product.quantity"
         placeholder="请输入数量"
         input-align="right"
-        :rules="[
-          {
-            validator: (val) => val > 0,
-            message: '数量必须大于0',
-          },
-        ]"
       />
       <!-- 价格输入增加货币格式 -->
       <van-field
         label="成本价"
+        type="number"
         v-model.number="product.costPrice"
         placeholder="请输入成本价"
         input-align="right"
       />
       <van-field
         label="销售价"
+        type="number"
         v-model.number="product.salePrice"
         placeholder="请输入销售价"
         input-align="right"
@@ -131,6 +128,7 @@
 import { computed, ref, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { showToast } from 'vant'
+import { handleConfirm } from '@/common/CompostionFunc'
 import { getRepairRecordsById, editRepairRecord, addRepairRecord } from '@/api/index'
 import Utils from '@/common/utils'
 import { RepairRecord } from '@/common/type'
@@ -155,7 +153,7 @@ const formData = ref<Partial<RepairRecord>>({
   productList: [
     {
       name: '',
-      quantity: 1,
+      quantity: '',
       spec: '',
       costPrice: '',
       salePrice: '',
@@ -187,22 +185,33 @@ function getList() {
 
 onMounted(getList)
 
+const handleProductNameChange = (value, index) => {
+  console.log('产品名称更改为:', value.target.value, index)
+  if (value && value.target && value.target.value && formData.value.productList) {
+    formData.value.productList[index].quantity = '1'
+    formData.value.productList[index].spec = '个'
+  }
+}
+
 const autoTotalCostPrice = computed(() => {
-  return (
+  const costPrice =
     formData.value.productList &&
     formData.value.productList
       .reduce((acc, cur) => acc + parseFloat(cur.costPrice || '0'), 0)
       .toFixed(2)
-  )
+
+  formData.value.autoTotalCostPrice = costPrice
+  return costPrice
 })
 
 const autoTotalSalePrice = computed(() => {
-  return (
+  const salePrice =
     formData.value.productList &&
     formData.value.productList
       .reduce((acc, cur) => acc + parseFloat(cur.salePrice || '0'), 0)
       .toFixed(2)
-  )
+  formData.value.autoTotalSalePrice = salePrice
+  return salePrice
 })
 
 // 总利润
@@ -253,7 +262,7 @@ const addProduct = () => {
   const newProduct = {
     name: '',
     spec: '',
-    quantity: 1,
+    quantity: '',
     costPrice: '',
     salePrice: '',
   }
@@ -263,6 +272,9 @@ const addProduct = () => {
 
 // 删除商品
 const removeProduct = (index) => {
+  const confirm = handleConfirm('确定删除该商品吗？')
+  if (!confirm) return
+
   if (formData.value.productList && formData.value.productList.length > 0) {
     formData.value.productList?.splice(index, 1)
     return
@@ -286,6 +298,7 @@ const handleSave = () => {
     .then((res) => {
       if (res.code == 200) {
         showToast('保存成功')
+        handleBack()
       } else {
         showToast(res.message || '保存失败')
       }

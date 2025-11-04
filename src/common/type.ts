@@ -23,7 +23,7 @@ export interface RepairRecord {
   productList: [{
     id?: number
     name: string // 产品名称
-    quantity: number // 数量
+    quantity: string // 数量
     spec: string // 规格
     costPrice: string // 成本价格
     salePrice: string // 销售价格

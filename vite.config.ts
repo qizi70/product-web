@@ -1,36 +1,24 @@
 import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
-type Env = {
-  VITE_PORT?: string, // 端口号
-  VITE_OPEN?: string, // 自动打开浏览器
-  VITE_PUBLIC_PATH?: string, // public path 配置线上环境路径（打包）、本地通过 http-server 访问时，请置空即可
-  VITE_STATIC_BASE?: string, // 打包后静态文件找的的根地址
-  VITE_API_BASEURL?: string,
-}
+export default defineConfig(({ mode, command }) => {
+  // 👇 关键：mode 就是 'development' 或 'production'
+  const env = loadEnv(mode, process.cwd())
 
-// https://vite.dev/config/
-export default defineConfig((config) => {
-  // 根据当前工作目录中的 `config` 加载 .env 文件
-  // 设置第三个参数为 '' 来加载所有环境变量，而不管是否有 `VITE_` 前缀。
-  const env: Env = loadEnv(config, process.cwd(), '')
+  console.log('当前模式:', mode)
+  console.log('env.VITE_NODE_CODE:', env.VITE_NODE_CODE)
 
   return {
-    base: env.VITE_NODE_CODE == 'develop' ? '/' : '/product-web/',
-    root: process.cwd(),
+    base: env.VITE_NODE_CODE === 'development' ? '/' : '/product-web/',
     build: {
       outDir: 'dist',
     },
     server: {
-      hmr: true,
       host: 'localhost',
-      port: env.VITE_PORT,
-      open: false, //服务启动时自动在浏览器中打开应用
-      strictPort: false, // 如果端口已占用是否直接退出
-      proxy: getProxy(config.command)
+      port: env.VITE_PORT || 3000,
+      proxy: getProxy(command),
     },
     plugins: [
       vue(),
@@ -41,32 +29,23 @@ export default defineConfig((config) => {
         '@': fileURLToPath(new URL('./src', import.meta.url))
       },
     },
-    compilerOptions: {
-      "baseUrl": ".",
-      "paths": {
-        "@/*": ["src/*"]
-      }
-    }
   }
 })
 
-type Command = 'serve' | 'build'
-function getProxy(command: Command) {
+function getProxy(command) {
   const proxy = {
     // '/api': {
-    //   target: 'https://dev-student.htexam.com/',
-    //   ws: true,
+    //   target: 'http://47.93.3.30:8081', // 你的真实目标地址
     //   changeOrigin: true,
-    //   rewrite: (path: String) => path.replace(/^\/studentApi/, ''),
+    //   // 添加以下 bypass 函数
+    //   bypass: function (req, res, options) {
+    //     // 构建代理后的真实URL
+    //     const proxyUrl = new URL(req.url || '', options.target)?.href || '';
+    //     // 将这个真实URL设置为响应头，方便在前端查看
+    //     res.setHeader('x-req-proxyUrl', proxyUrl);
+
+    //   }
     // }
   }
-  if (command == 'serve') {
-    proxy['/api'] = { // 不走 axios 的接口临时用
-      target: 'http://localhost:8081',
-      ws: true,
-      changeOrigin: true,
-    }
-  }
-
   return proxy
 }
