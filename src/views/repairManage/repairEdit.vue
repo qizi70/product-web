@@ -271,8 +271,8 @@ const addProduct = () => {
 }
 
 // 删除商品
-const removeProduct = (index) => {
-  const confirm = handleConfirm('确定删除该商品吗？')
+const removeProduct = async (index) => {
+  const confirm = await handleConfirm('确定删除该商品吗？')
   if (!confirm) return
 
   if (formData.value.productList && formData.value.productList.length > 0) {

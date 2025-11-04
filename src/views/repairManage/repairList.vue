@@ -189,7 +189,7 @@ const editModel = (modelId) => {
 
 // 删除车型
 const deleteModel = async (modelId) => {
-  const confirm = handleConfirm('确定删除该车型吗？')
+  const confirm = await handleConfirm('确定删除该车型吗？')
   if (!confirm) return
 
   deleteRepairRecord(modelId).then(

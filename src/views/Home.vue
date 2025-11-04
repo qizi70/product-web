@@ -6,13 +6,13 @@
     <div class="button-group">
       <van-button type="primary" block size="large" @click="navigateToEdit"> 维修管理 </van-button>
 
-      <van-button type="default" block size="large" @click="navigateToView"> 记录查看 </van-button>
+      <!-- <van-button type="default" block size="large" @click="navigateToView"> 记录查看 </van-button> -->
     </div>
 
     <van-tabbar route>
       <van-tabbar-item to="/" icon="home-o">首页</van-tabbar-item>
-      <van-tabbar-item to="/edit" icon="edit">编辑</van-tabbar-item>
-      <van-tabbar-item to="/view" icon="file-text-o">记录</van-tabbar-item>
+      <!-- <van-tabbar-item to="/edit" icon="edit">编辑</van-tabbar-item>
+      <van-tabbar-item to="/view" icon="file-text-o">记录</van-tabbar-item> -->
     </van-tabbar>
   </div>
 </template>
