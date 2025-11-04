@@ -115,7 +115,6 @@ const loading = ref(false)
 function getList() {
   getRepairRecords({ date: selectedDate.value }).then(
     (res) => {
-      console.log('res: ', res)
       if (res.code == 200 && res.data) {
         models.value = res.data
       }
@@ -192,7 +191,7 @@ const deleteModel = async (modelId) => {
   const confirm = await handleConfirm('确定删除该车型吗？')
   if (!confirm) return
 
-  deleteRepairRecord(modelId).then(
+  deleteRepairRecord({ id: modelId }).then(
     (res) => {
       if (res.code == 200) {
         showToast('删除成功')
@@ -214,7 +213,6 @@ const addNewModel = () => {
 
 // 计算单个车型的利润
 const calculateProfit = (model) => {
-  console.log('model: ', model)
   const totalCostPrice = model.inputTotalCostPrice || model.autoTotalCostPrice || 0
   const totalSalePrice = model.inputTotalSalePrice || model.autoTotalSalePrice || 0
   return `总收入：¥${totalSalePrice} 总成本：¥${totalCostPrice}`
