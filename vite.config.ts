@@ -18,7 +18,7 @@ export default defineConfig(({ mode, command }) => {
     server: {
       host: 'localhost',
       port: env.VITE_PORT || 3000,
-      proxy: getProxy(command),
+      proxy: getProxy(env.VITE_NODE_CODE),
     },
     plugins: [
       vue(),
@@ -32,20 +32,21 @@ export default defineConfig(({ mode, command }) => {
   }
 })
 
-function getProxy(command) {
-  const proxy = {
-    // '/api': {
-    //   target: 'http://47.93.3.30:8081', // 你的真实目标地址
-    //   changeOrigin: true,
-    //   // 添加以下 bypass 函数
-    //   bypass: function (req, res, options) {
-    //     // 构建代理后的真实URL
-    //     const proxyUrl = new URL(req.url || '', options.target)?.href || '';
-    //     // 将这个真实URL设置为响应头，方便在前端查看
-    //     res.setHeader('x-req-proxyUrl', proxyUrl);
+function getProxy(viteNodeCode) {
+  const proxy = {}
+  if (viteNodeCode === 'development') {
+    proxy['/api'] = {
+      target: 'http://localhost:8081', // 你的真实目标地址
+      changeOrigin: true,
+      // 添加以下 bypass 函数
+      bypass: function (req, res, options) {
+        // 构建代理后的真实URL
+        const proxyUrl = new URL(req.url || '', options.target)?.href || '';
+        // 将这个真实URL设置为响应头，方便在前端查看
+        res.setHeader('x-req-proxyUrl', proxyUrl);
 
-    //   }
-    // }
+      }
+    }
   }
   return proxy
 }

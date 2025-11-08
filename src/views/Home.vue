@@ -6,7 +6,7 @@
     <div class="button-group">
       <van-button type="primary" block size="large" @click="navigateToEdit"> 维修管理 </van-button>
 
-      <!-- <van-button type="default" block size="large" @click="navigateToView"> 记录查看 </van-button> -->
+      <van-button type="default" block size="large" @click="navigateToView"> 记录查看 </van-button>
     </div>
 
     <van-tabbar route>
@@ -31,7 +31,7 @@ const navigateToEdit = () => {
 
 // 导航到记录查看页面
 const navigateToView = () => {
-  router.push('/view')
+  router.push({ name: 'repairSummaries' })
 }
 
 // 初始化加载数据

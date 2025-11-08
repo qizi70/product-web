@@ -68,16 +68,6 @@ instance.interceptors.response.use(
   (response: any) => {
     const code = response.data.code
     const data = response.data
-    if (code === 200) {
-      // if (data.data && data.data.redirectUrl) {
-      //   let url = location.origin + '/student/auth/cas/callBackUrl'
-      //   let oaToken = sessionStorage.getItem('oaToken')
-      //   if (!localStorage.getItem('token') && !oaToken) {
-      //     window.location.href = data.data.redirectUrl + encodeURIComponent(url)
-      //   }
-      //   return new Promise(() => { })
-      // }
-    }
     response.config.hideLoading && response.config.hideLoading()
     return response
   },

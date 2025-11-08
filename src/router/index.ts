@@ -2,11 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 import repairManage from '@/views/repairManage/repairList.vue';
 import repairManageEdit from '@/views/repairManage/repairEdit.vue';
+import repairSummaries from '@/views/DailySummaries/index.vue';
 
 const routes = [
   { path: '/', component: () => import('@/views/Home.vue') },
-  { path: '/view', component: () => import('@/views/RecordList.vue') },
-  { path: '/view/:id', component: () => import('@/views/RecordDetail.vue') },
 
   // 维修管理
   {
@@ -24,7 +23,17 @@ const routes = [
     meta: {
       title: '详情管理',
     }
-  }
+  },
+  // 记录查看
+  {
+    path: '/repairSummaries',
+    name: 'repairSummaries',
+    component: repairSummaries,
+    meta: {
+      title: '记录查看',
+    },
+  },
+
 
 
 ];

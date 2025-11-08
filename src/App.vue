@@ -7,6 +7,11 @@
   </div>
 </template>
 
+<style>
+.mr-5 {
+  margin-right: 5px;
+}
+</style>
 <style scoped>
 #app {
   min-height: 100vh;

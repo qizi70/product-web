@@ -21,18 +21,18 @@
     </van-popup>
 
     <!-- 费用支出 -->
-    <div class="cost">
+    <div class="cost" v-if="dailySummaryData.length > 0">
       <van-cell title="费用支出" center class="date-picker-cell">
         <div>
-          <span>销售额：¥{{ cost.curSale }}&nbsp;&nbsp;</span>
-          <span>商品成本：¥{{ cost.curCost }}</span>
+          <span>销售额：¥{{ cost.sale }}&nbsp;&nbsp;</span>
+          <span>商品成本：¥{{ cost.cost }}</span>
         </div>
         <div>
-          <span>房租：¥{{ cost.curRent }}&nbsp;&nbsp;</span>
-          <span>工资：¥{{ cost.curSalary }}</span>
+          <span>房租：¥{{ cost.rent }}&nbsp;&nbsp;</span>
+          <span>工资：¥{{ cost.salaryCost }}</span>
         </div>
         <div>
-          <span>利润：¥{{ cost.curProfit }}</span>
+          <span>利润：¥{{ cost.profit }}</span>
         </div>
         <div>
           <span>平均利润：¥{{ cost.curAverageProfit }}</span>
@@ -46,7 +46,7 @@
 
     <!-- 车型列表 -->
     <div class="model-list">
-      <van-swipe-cell v-for="model in models" :key="model.id">
+      <van-swipe-cell v-for="model in tableData" :key="model.id">
         <van-cell
           :title="model.modelName"
           @click="editModel(model.id)"
@@ -56,7 +56,7 @@
         >
           <template #default>
             <div class="model-item-cell">
-              <div class="model-date">时间：{{ model.createdAt }}</div>
+              <div class="model-date">时间：{{ Utils.formatStringDateTime(model.createdAt) }}</div>
               <div class="model-profit">{{ calculateProfit(model) }}</div>
               <div class="model-profit">
                 利润：<span style="color: #f40">¥{{ model.totalProfit }}</span>
@@ -80,7 +80,7 @@
     <van-loading v-if="loading" class="loading" />
 
     <!-- 空数据状态 -->
-    <div v-if="!loading && models.length === 0" class="empty-state">
+    <div v-if="!loading && tableData.length === 0" class="empty-state">
       <van-empty description="暂无车型数据" image="search" />
       <van-button type="primary" style="margin-top: 20px" @click="addNewModel">
         添加首个车型
@@ -100,23 +100,25 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { handleConfirm } from '@/common/CompostionFunc'
-import { getRepairRecords, deleteRepairRecord } from '@/api/index'
+import { getRepairRecords, deleteRepairRecord, getDailySummaries } from '@/api/index'
 import { showToast } from 'vant'
 import Utils from '@/common/utils'
+import { DailySummary } from '@/common/type'
 
 const router = useRouter()
 
-const models = ref<any[]>([])
+const tableData = ref<any[]>([])
 const selectedDate = ref(Utils.getNewDate())
 const showPicker = ref(false)
 const datePickerValue = ref(Utils.getNewDate().split('-'))
+const dailySummaryData = ref([] as DailySummary[])
 const loading = ref(false)
 
 function getList() {
   getRepairRecords({ date: selectedDate.value }).then(
     (res) => {
       if (res.code == 200 && res.data) {
-        models.value = res.data
+        tableData.value = res.data
       }
       loading.value = false
     },
@@ -125,35 +127,36 @@ function getList() {
       loading.value = false
     },
   )
+
+  getDailySummaries(
+    '?' + Utils.objToQueryString({ startDate: selectedDate.value, endDate: selectedDate.value }),
+  )
+    .then((res) => {
+      if (res.code == 200 && res.data) {
+        dailySummaryData.value = res.data || []
+      }
+      loading.value = false
+    })
+    .catch((err) => {
+      loading.value = false
+    })
 }
 
 onMounted(getList)
 
 const cost = computed(() => {
   const obj = {
-    curSale: 0, // 当日销售额
-    curCost: 0, // 当日商品成本
-    curRent: 824, // 当日租金
-    curSalary: 683, // 当日工资
-    curProfit: 0, // 当日利润
+    ...dailySummaryData.value[0],
     curAverageProfit: 0, // 当日平均利润
     dazhongSale: 0, // 当日大众利润
     hjSale: 0, // 当日恒捷利润
   }
-  models.value.forEach((item) => {
-    obj.curCost += +item.inputTotalCostPrice || +item.autoTotalCostPrice || 0
-    obj.curSale += +item.inputTotalSalePrice || +item.autoTotalSalePrice || 0
-  })
-  // 当日总成本
-  const curTotalCost = obj.curRent + obj.curSalary + obj.curCost
-  // 当日总利润
-  obj.curProfit = obj.curSale - curTotalCost
   // 当日平均利润
-  obj.curAverageProfit = obj.curProfit / 2
+  obj.curAverageProfit = Number(obj.profit) / 2
   // 当日收入分成：二分之一给大众
-  obj.dazhongSale = obj.curAverageProfit + obj.curRent
+  obj.dazhongSale = obj.curAverageProfit + Number(obj.rent)
   // 当日收入分成：二分之一给恒捷
-  obj.hjSale = obj.curAverageProfit + obj.curSalary
+  obj.hjSale = obj.curAverageProfit + Number(obj.salaryCost)
 
   return obj
 })

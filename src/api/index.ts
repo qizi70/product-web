@@ -11,3 +11,8 @@ export const addRepairRecord = params => myPost(`/api/repair-records/add`, param
 export const editRepairRecord = params => myPost(`/api/repair-records/edit/${params.id}`, params)
 // 删除维修记录
 export const deleteRepairRecord = params => myPost(`/api/repair-records/delete/${params.id}`)
+
+
+// 记录查看
+// 获取记录查看列表
+export const getDailySummaries = date => myGet(`/api/daily-summary/get${date}`)

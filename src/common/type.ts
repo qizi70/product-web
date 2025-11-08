@@ -30,3 +30,18 @@ export interface RepairRecord {
   }]
 
 }
+
+export interface DailySummary {
+  date: string // 日期
+  cost: string // 成本价格
+  sale: string // 销售额
+  profit: string // 利润
+  rent: string // 房租成本
+  salaryCost: number // 员工成本
+  salaryList: [{
+    id?: number
+    name: string // 员工姓名
+    salary: number // 工资
+    work: 1 | 2 | 3 | 4 // 是否工作 1 全天 2 上午班 3 下午班 4 请假'
+  }]
+}
